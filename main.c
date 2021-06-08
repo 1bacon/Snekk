@@ -1,11 +1,14 @@
-#include <ncurses.h>
+#include <curses.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
+#include "entity.h"
+
 #define FPS 15
-#define UNICODE 1
+#define UNICODE
+#define DEBUG
 
 #if defined UNICODE
 #define MIDDLE_HORIZONTAL '═'
@@ -23,10 +26,6 @@
 #define BOTTOM_RIGHT '+'
 #endif
 
-typedef struct _Point
-{
-  int x, y;
-} Point;
 
 clock_t t, t_t;
 
@@ -39,8 +38,8 @@ double deltaTime = 16;
 double deltaTime_t = 16;
 int frameCount = 0;
 
-Point pos[100];
-Point apple;
+Snake s;
+Vector apple;
 
 int size;
 
@@ -50,9 +49,10 @@ void debug_draw()
   sprintf(lines[0], "frameCount: %d", frameCount);
   sprintf(lines[1], "deltaT: %f", deltaTime);
   sprintf(lines[2], "deltaT_t: %f", deltaTime_t);
-  sprintf(lines[3], "x: %d, y: %d", pos[0].x, pos[0].y);
-  sprintf(lines[4], "size: %d", size);
-  int n = 5;
+  sprintf(lines[3], "x: %d, y: %d", s.points[0].x, s.points[0].y);
+  sprintf(lines[4], "size: %d", s.length);
+  sprintf(lines[5], "mx: %d, my: %d", mx, my);
+  int n = 6;
   int lo = 0;
   for (int i = 0; i < n; i++)
   {
@@ -65,9 +65,8 @@ void debug_draw()
     mvprintw(i, mx - lo - 2, "|");
   }
   char a[50];
-  sprintf(a,"%.*s\n", lo-1,"------------------------------------"); 
-  mvprintw(n+1, mx - lo - 1, a);
-  mvprintw(n+1,mx-1,"\u2528");
+  sprintf(a,"%s%.*s", "+",lo,"------------------------------------"); 
+  mvprintw(n+1, mx - lo - 2, a);
 }
 
 void setApple()
@@ -78,26 +77,28 @@ void setApple()
 
   for (int i = 0; i < size; i++)
   {
-    if (pos[i].x == rx && pos[i].y == ry || rx < 1 || ry < 1 ||rx >= mx-1 || ry >= my-1  )
+    if (s.points[i].x == rx && s.points[i].y == ry || rx < 1 || ry < 1 ||rx >= mx-1 || ry >= my-1  )
       goto start;
   }
 
   apple.x = rx;
   apple.y = ry;
-  mvprintw(ry,rx,"o");
+  mvprintw(ry+1,rx+1,"o");
 }
 
 void gameLoop()
 {
 
+  s = initSnake(5,100);
+
   int dir = 0;
-  int grow = 0;
-  size = 5;
   cbreak();
   nodelay(stdscr, 1);
 
-  pos[0].x = mx / 2;
-  pos[0].y = my / 2;
+  s.points[0].x = mx / 2;
+  s.points[0].y = my / 2;
+  Vector movement;
+  setVector(&movement, 1, 0);
 
   setApple();
 
@@ -113,64 +114,39 @@ void gameLoop()
     switch (input)
     {
     case 'w':
-      dir = dir != 3 ? 1 : dir;
+      movement.y != 1 ? setVector(&movement, 0, -1) : movement.y;
       break;
     case 's':
-      dir = dir != 1 ? 3 : dir;
+      movement.y != -1 ? setVector(&movement, 0, 1) : movement.y;
       break;
     case 'a':
-      dir = dir != 0 ? 2 : dir;
+      movement.x != 1 ? setVector(&movement, -1, 0) : movement.x;
       break;
     case 'd':
-      dir = dir != 2 ? 0 : dir;
+      movement.x != -1 ? setVector(&movement, 1, 0) : movement.x;
       break;
     case 'e':
-      grow = 1;
+      s.length++;
       break;
     case 27:
       stop = 1;
       break;
     }
 
-    for (int i = size; i > 0; i--)
-    {
-      pos[i] = pos[i - 1];
-    }
+    SnakeUpdate(&s);
+    SnakeMoveInDir(&s, &movement);
 
-    switch (dir)
-    {
-    case 0:
-      pos[0].x++;
-      break;
-    case 1:
-      pos[0].y--;
-      break;
-    case 2:
-      pos[0].x--;
-      break;
-    case 3:
-      pos[0].y++;
-      break;
-    }
-    if (grow)
-    {
-      size++;
-      grow = 0;
-    }
-    else
-    {
-      mvprintw(pos[size].y, pos[size].x, " ");
-    }
-    mvprintw(pos[0].y, pos[0].x, "#");
+    mvprintw(s.points[s.length].y+1, s.points[s.length].x+1, " ");
+    mvprintw(s.points[0].y+1, s.points[0].x+1, "#");
 
-    if (pos[0].x == apple.x && pos[0].y == apple.y)
+    if (s.points[0].x == apple.x && s.points[0].y == apple.y)
     {
-      size++;
+      s.length++;
       setApple();
     }
     for (int i = 1; i < size; i++)
     {
-      if(pos[0].x == pos[i].x && pos[0].y == pos[i].y){
+      if(s.points[0].x == s.points[i].x && s.points[0].y == s.points[i].y){
         stop = 1;
       }
     }
@@ -179,7 +155,9 @@ void gameLoop()
     deltaTime = ((double)elapsed) / CLOCKS_PER_SEC;
     deltaTime_t = ((double)1000 * (clock() - t_t)) / CLOCKS_PER_SEC;
     frameCount++;
-    debug_draw();
+    #if defined DEBUG
+      debug_draw();
+    #endif
 
     move(0, 0);
   };
