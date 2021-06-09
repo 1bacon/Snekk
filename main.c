@@ -8,24 +8,7 @@
 #include "entity.h"
 
 #define FPS 15
-#define UNICODE
 #define DEBUG
-
-#if defined UNICODE
-#define MIDDLE_HORIZONTAL '═'
-#define MIDDLE_VERTICAL '║'
-#define TOP_LEFT '╔'
-#define TOP_RIGHT '╗'
-#define BOTTOM_LEFT '╚'
-#define BOTTOM_RIGHT '╝'
-#else
-#define MIDDLE_HORIZONTAL '-'
-#define MIDDLE_VERTICAL '|'
-#define TOP_LEFT '+'
-#define TOP_RIGHT '+'
-#define BOTTOM_LEFT '+'
-#define BOTTOM_RIGHT '+'
-#endif
 
 
 clock_t t, t_t;
