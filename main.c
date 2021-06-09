@@ -87,7 +87,7 @@ void setApple()
 void gameLoop()
 {
 
-  s = initSnake(5,10);
+  s = initSnake(5,100);
 
   int dir = 0;
   cbreak();
