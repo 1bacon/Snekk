@@ -5,16 +5,10 @@
             "label": "C/C++: gcc.exe Aktive Datei kompilieren",
             "command": "C:\\MinGW\\bin\\make.exe",
             "args": [
-                /*"-g",
-                "${file}",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "-l:pdcurses.a",
-                "-I",
-                "."*/
+                "win"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"

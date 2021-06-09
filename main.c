@@ -41,8 +41,6 @@ int frameCount = 0;
 Snake s;
 Vector apple;
 
-int size;
-
 void debug_draw()
 {
   const char lines[10][50];
@@ -75,7 +73,7 @@ void setApple()
   int rx = rand() * (double)((double)mx / (double)RAND_MAX);
   int ry = rand() * (double)((double)my / (double)RAND_MAX);
 
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < s.length; i++)
   {
     if (s.points[i].x == rx && s.points[i].y == ry || rx < 1 || ry < 1 ||rx >= mx-1 || ry >= my-1  )
       goto start;
@@ -89,7 +87,7 @@ void setApple()
 void gameLoop()
 {
 
-  s = initSnake(5,100);
+  s = initSnake(5,10);
 
   int dir = 0;
   cbreak();
@@ -133,10 +131,12 @@ void gameLoop()
       break;
     }
 
+
+
     SnakeUpdate(&s);
     SnakeMoveInDir(&s, &movement);
 
-    mvprintw(s.points[s.length].y+1, s.points[s.length].x+1, " ");
+    mvprintw(s.points[SnakeSizeMax(&s)].y+1, s.points[SnakeSizeMax(&s)].x+1, " ");
     mvprintw(s.points[0].y+1, s.points[0].x+1, "#");
 
     if (s.points[0].x == apple.x && s.points[0].y == apple.y)
@@ -144,7 +144,7 @@ void gameLoop()
       s.length++;
       setApple();
     }
-    for (int i = 1; i < size; i++)
+    for (int i = 1; i < s.length; i++)
     {
       if(s.points[0].x == s.points[i].x && s.points[0].y == s.points[i].y){
         stop = 1;
@@ -170,10 +170,10 @@ int main()
 
   WINDOW *window;
 
-  initscr();            /* Start curses mode 		*/
-  raw();                /* Line buffering disabled	*/
-  keypad(stdscr, TRUE); /* We get F1, F2 etc..		*/
-  noecho();             /* Don't echo() while we do getch */
+  initscr();            
+  raw();                
+  keypad(stdscr, TRUE); 
+  noecho();             
 
   mx = getmaxx(stdscr);
   my = getmaxy(stdscr);

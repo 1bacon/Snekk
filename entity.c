@@ -28,8 +28,7 @@ char* vectorToString(char* b, Vector* v){
 
 Snake initSnake(int initalLength, int maxLength){
     Snake s;
-    Vector points[maxLength];
-    s.points = points;
+    s.points = malloc(initalLength * sizeof(Vector));
     s.length = initalLength;
     s.maxLength = maxLength;
     return s;
@@ -43,9 +42,11 @@ void SnakeMoveInDir(Snake* s, Vector* v){
     s->points[0].y = s->points[0].y + v->y;
 }
 void SnakeUpdate(Snake* s){
-    int j = s->length > s->maxLength ? s->maxLength : s->length; 
-    for (int i = j; i > 0; i--)
+    for (int i = SnakeSizeMax(s); i > 0; i--)
     {
         s->points[i] = s->points[i - 1];
     }
+}
+int SnakeSizeMax(Snake* s){
+    return s->length > s->maxLength ? s->maxLength : s->length; 
 }

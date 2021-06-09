@@ -21,3 +21,4 @@ Snake initSnake(int,int);
 void SnakeMoveTo(Snake*, Vector*);
 void SnakeMoveInDir(Snake*, Vector*);
 void SnakeUpdate(Snake*);
+int SnakeSizeMax(Snake*);
