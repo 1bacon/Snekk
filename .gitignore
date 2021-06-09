@@ -1,4 +1,4 @@
 #.gitignore
-main.exe
 .vscode
+main.exe
 main

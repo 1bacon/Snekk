@@ -1,5 +1,6 @@
 #include <curses.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -58,7 +59,7 @@ void debug_draw()
     lo = l > lo ? l : lo;
     mvprintw(i + 1, mx - l - 1, lines[i]);
   }
-  for (int i = 1; i < 6; i++)
+  for (int i = 1; i < n+1; i++)
   {
     mvprintw(i, mx - lo - 2, "|");
   }
@@ -75,7 +76,7 @@ void setApple()
 
   for (int i = 0; i < s.length; i++)
   {
-    if (s.points[i].x == rx && s.points[i].y == ry || rx < 1 || ry < 1 ||rx >= mx-1 || ry >= my-1  )
+    if ((s.points[i].x == rx && s.points[i].y == ry) || rx < 1 || ry < 1 ||rx >= mx-1 || ry >= my-1  )
       goto start;
   }
 
@@ -88,8 +89,6 @@ void gameLoop()
 {
 
   s = initSnake(5,100);
-
-  int dir = 0;
   cbreak();
   nodelay(stdscr, 1);
 
@@ -167,9 +166,6 @@ int main()
 {
 
   srand(time(NULL));
-
-  WINDOW *window;
-
   initscr();            
   raw();                
   keypad(stdscr, TRUE); 
