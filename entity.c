@@ -28,7 +28,7 @@ char* vectorToString(char* b, Vector* v){
 
 Snake initSnake(int initalLength, int maxLength){
     Snake s;
-    s.points = malloc(initalLength * sizeof(Vector));
+    s.points = malloc(maxLength * sizeof(Vector));
     s.length = initalLength;
     s.maxLength = maxLength;
     return s;
